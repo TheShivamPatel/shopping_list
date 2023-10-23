@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopping_list/data/categoriesData.dart';
-import 'package:shopping_list/models/categoriesModel.dart';
 import 'package:shopping_list/models/groceryItemsModel.dart';
 import 'package:shopping_list/widgets/new_item.dart';
 
@@ -27,8 +25,7 @@ class _GroceryListState extends State<GroceryList> {
     final url = Uri.https(
         'flutter-prep-9863a-default-rtdb.firebaseio.com', 'shopping-list.json');
     final response = await http.get(url);
-    final Map<String, dynamic> listData =
-        json.decode(response.body);
+    final Map<String, dynamic> listData = json.decode(response.body);
     final List<GroceryItemsModel> loadedItemList = [];
 
     for (final items in listData.entries) {
@@ -46,17 +43,22 @@ class _GroceryListState extends State<GroceryList> {
       );
     }
     setState(() {
-    _groceryItems = loadedItemList;
+      _groceryItems = loadedItemList;
     });
   }
 
   void _addNewItem() async {
-    await Navigator.of(context).push<GroceryItemsModel>(
+    final newItem = await Navigator.of(context).push<GroceryItemsModel>(
       MaterialPageRoute(
         builder: (context) => const NewItem(),
       ),
     );
-    _loadItem();
+    if (newItem == null) {
+      return;
+    }
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   @override
